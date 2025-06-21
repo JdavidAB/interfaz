@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Control UR3 - Web</title>
+</head>
+<body>
+    <h1>Control Articulaciones UR3 - Web</h1>
+
+    <label>Articulación 1:</label>
+    <input type="range" id="slider1" min="-180" max="180" value="0" oninput="sendJoint(1, this.value)"><br>
+
+    <label>Articulación 2:</label>
+    <input type="range" id="slider2" min="-180" max="180" value="0" oninput="sendJoint(2, this.value)"><br>
+
+    <label>Articulación 3:</label>
+    <input type="range" id="slider3" min="-180" max="180" value="0" oninput="sendJoint(3, this.value)"><br>
+
+    <label>Articulación 4:</label>
+    <input type="range" id="slider4" min="-180" max="180" value="0" oninput="sendJoint(4, this.value)"><br>
+
+    <label>Articulación 5:</label>
+    <input type="range" id="slider5" min="-180" max="180" value="0" oninput="sendJoint(5, this.value)"><br>
+
+    <label>Articulación 6:</label>
+    <input type="range" id="slider6" min="-180" max="180" value="0" oninput="sendJoint(6, this.value)"><br>
+
+    <!-- Agrega mas sliders para J3 a J6 -->
+    <p id="status">Estado: Desconectado</p>
+
+    <script>
+        let socket = new WebSocket("wss://servidor-websocket-m4tf.onrender.com");
+
+        socket.onopen = function() {
+            document.getElementById("status").innerText = "Estado: Conectado";
+            console.log("Conectado a WebSocket");
+        };
+
+        socket.onmessage = function(event) {
+            console.log("Mensaje recibido:", event.data);
+        };
+
+        function sendJoint(jointNumber, value) {
+            const message = `J${jointNumber}:${value}`;
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(message);
+                console.log("Enviado:", message);
+            } else {
+                console.log("WebSocket no esta conectado");
+            }
+        }
+    </script>
+</body>
+</html>
