@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Control UR3 - Web</title>
+  <style>
+    /*body {
+      background-color: #b2b2b2;
+      margin: 2;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }*/
+
+    h2 {
+      text-align: center;
+      margin-top: 20px;
+      color: #000000;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      margin: 40px;
+    }
+
+    .video-box, .control-box {
+      background-color: #e6e6e6;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    iframe {
+      border: 3px solid #636363;
+    }
+
+    .control-box label {
+      display: block;
+      margin-top: 10px;
+    }
+    .control-box {
+      background-color: #e6e6e6;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      margin-top: 40px;      /* mas abajo */
+      margin-left: -20px;    /* mas a la izquierda */
+    }
+
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #222;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-image: url('https://www.pngkey.com/png/detail/190-1900939_ur3-robot-ur3e.png'); /* Reemplaza con tu imagen */
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-attachment: fixed; /* hace que no se mueva al hacer scroll */
+      position: relative;
+      /* Aplica un filtro de opacidad o desenfoque con una capa encima si quieres mas suavidad */
+    }
+
+    .overlay {
+      background-color: rgba(171, 171, 171, 0.678); /* Blanco semi-transparente */
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: -1;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay"></div>
+  <h2>ROBOT UR3</h2>
+
+  <div class="container">
+
+    <div class="video-box">
+      <h3>Vista en Vivo Desde Unity (RenderStreaming)</h3>
+      <iframe src="https://5be9-152-202-15-190.ngrok-free.app/receiver/index.html"
+              width="650"
+              height="480"
+              allowfullscreen></iframe>
+    </div>
+
+    <div class="control-box">
+      <h3>Control de Articulaciones</h3>
+
+      <label>Articulación 1:</label>
+      <input type="range" id="slider1" min="-180" max="180" value="0" oninput="sendJoint(1, this.value)"><br>
+
+      <label>Articulación 2:</label>
+      <input type="range" id="slider2" min="-180" max="180" value="0" oninput="sendJoint(2, this.value)"><br>
+
+      <label>Articulación 3:</label>
+      <input type="range" id="slider3" min="-180" max="180" value="0" oninput="sendJoint(3, this.value)"><br>
+
+      <label>Articulación 4:</label>
+      <input type="range" id="slider4" min="-180" max="180" value="0" oninput="sendJoint(4, this.value)"><br>
+
+      <label>Articulación 5:</label>
+      <input type="range" id="slider5" min="-180" max="180" value="0" oninput="sendJoint(5, this.value)"><br>
+
+      <label>Articulación 6:</label>
+      <input type="range" id="slider6" min="-180" max="180" value="0" oninput="sendJoint(6, this.value)"><br>
+
+      <!-- Agrega mas sliders para J3 a J6 -->
+      <p id="status">Estado: Desconectado</p>
+    </div>
+
+  </div>
+
+  <script>
+    let socket = new WebSocket("wss://servidor-websocket-m4tf.onrender.com");
+
+    socket.onopen = function() {
+      document.getElementById("status").innerText = "Estado: Conectado";
+      console.log("Conectado a WebSocket");
+    };
+
+    socket.onmessage = function(event) {
+      console.log("Mensaje recibido:", event.data);
+    };
+
+    function sendJoint(jointNumber, value) {
+      const message = `J${jointNumber}:${value}`;
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(message);
+        console.log("Enviado:", message);
+      } else {
+        console.log("WebSocket no esta conectado");
+      }
+    }
+  </script>
+
+</body>
+</html>
